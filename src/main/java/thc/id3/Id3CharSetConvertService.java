@@ -39,9 +39,9 @@ public class Id3CharSetConvertService {
 	private static final String DEFAULT_FROM_ENCODING = "big5";
 	private static final String DEFAULT_TO_ENCODING = "utf-8";
 	
-	private final Id3CharSetConvertorParameters params;
+	private final Id3CharSetConverterParameters params;
 	
-	public Id3CharSetConvertService(Id3CharSetConvertorParameters params) {
+	public Id3CharSetConvertService(Id3CharSetConverterParameters params) {
 		this.params = params;
 	}
 

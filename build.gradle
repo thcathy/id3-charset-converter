@@ -16,7 +16,7 @@ apply plugin: 'idea'
 apply plugin: 'spring-boot' 
 
 jar {
-	baseName = 'Id3CharSetConvertor'
+	baseName = 'Id3CharSetConverter'
 	version = '0.0.1-SNAPSHOT'
 }
 

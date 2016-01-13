@@ -9,22 +9,22 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class Id3CharSetConvertorCommandTest {
+public class Id3CharSetConverterCommandTest {
 	
 	@Mock
-	Id3CharSetConvertorParameters params;
+	Id3CharSetConverterParameters params;
 	
 	@Test
 	public void givenArgsWithHelp_shouldPrintUsage() throws Exception {
 		// given 
 		when(params.isHelp()).thenReturn(true);
 		
-		new Id3CharSetConvertorCommand(params).run();
+		new Id3CharSetConverterCommand(params).run();
 		
 		verify(params, times(1)).printHelp();
 	}
 	
 	public void givenNoArgs_shouldGivenException() throws Exception {
-		new Id3CharSetConvertorCommand(params).run();
+		new Id3CharSetConverterCommand(params).run();
 	}
 }

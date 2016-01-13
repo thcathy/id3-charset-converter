@@ -9,7 +9,7 @@ import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
-public class Id3CharSetConvertorParameters {
+public class Id3CharSetConverterParameters {
 	final static String OPTION_HELP = "help";
 	final static String OPTION_TEST = "test";
 	final static String OPTION_INPUT_FILE = "input-file";
@@ -20,7 +20,7 @@ public class Id3CharSetConvertorParameters {
 	
 	final CommandLine commandLine; 
 	
-	private Id3CharSetConvertorParameters(CommandLine commandLine) {
+	private Id3CharSetConverterParameters(CommandLine commandLine) {
 		this.commandLine = commandLine;		
 	}
 	
@@ -51,9 +51,9 @@ public class Id3CharSetConvertorParameters {
 		return options;
 	}
 
-	public static Id3CharSetConvertorParameters parse(String[] args) throws Exception {		
+	public static Id3CharSetConverterParameters parse(String[] args) throws Exception {		
 		CommandLineParser parser = new DefaultParser();
-		Id3CharSetConvertorParameters params = new Id3CharSetConvertorParameters(parser.parse(options, args));
+		Id3CharSetConverterParameters params = new Id3CharSetConverterParameters(parser.parse(options, args));
 		
 		if (params.noInputFileAndFolder()) 
 			throw new MissingArgumentException("Require argument input file or input folder");
