@@ -14,7 +14,6 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'spring-boot' 
-apply plugin: 'jacoco'
 
 jar {
 	baseName = 'Id3CharSetConverter'
@@ -35,16 +34,4 @@ dependencies {
 	compile('com.mpatric:mp3agic:0.8.3')
 	compile('org.apache.commons:commons-lang3:3.4')
 	testCompile('org.springframework.boot:spring-boot-starter-test') 
-}
-
-task wrapper(type: Wrapper) {
-	gradleVersion = '2.9'
-}
-
-test {
-	jacoco {
-		append = false
-		destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
-		classDumpFile = file("$buildDir/jacoco/classpathdumps")
-	}
 }
