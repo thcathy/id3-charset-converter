@@ -55,14 +55,14 @@ public class Id3CharSetConverterParameters {
 		CommandLineParser parser = new DefaultParser();
 		Id3CharSetConverterParameters params = new Id3CharSetConverterParameters(parser.parse(options, args));
 		
-		if (params.noInputFileAndFolder()) 
+		if (params.noInputFileAndFolderAndHelp()) 
 			throw new MissingArgumentException("Require argument input file or input folder");
 		else 
 			return params;
 	}
 
-	private boolean noInputFileAndFolder() {
-		return !(this.getInputFile().isPresent() || this.getInputFolder().isPresent());
+	private boolean noInputFileAndFolderAndHelp() {
+		return !(this.getInputFile().isPresent() || this.getInputFolder().isPresent() || this.isHelp());
 	}
 
 	public boolean isHelp() {

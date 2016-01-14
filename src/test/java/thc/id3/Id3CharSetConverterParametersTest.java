@@ -71,10 +71,10 @@ public class Id3CharSetConverterParametersTest {
 	@Test
 	public void givenOptionOutputFileWithArgs_shouldReturnArgs() throws Exception {
 		final String outputFileName = "src/test/java/Id3EncodingConverterCommandTest.java";
-		Id3CharSetConverterParameters params = Id3CharSetConverterParameters.parse(new String[] {"-o", outputFileName});
+		Id3CharSetConverterParameters params = Id3CharSetConverterParameters.parse(new String[] {"-ho", outputFileName});
 		assertEquals(outputFileName, params.getOutputFile().get());		
 				
-		params = Id3CharSetConverterParameters.parse(new String[] {"--output-file", outputFileName});
+		params = Id3CharSetConverterParameters.parse(new String[] {"-h", "--output-file", outputFileName});
 		assertEquals(outputFileName, params.getOutputFile().get());
 	}
 	
@@ -84,15 +84,6 @@ public class Id3CharSetConverterParametersTest {
 		assertEquals(Optional.empty(), params.getOutputFile());
 	}
 	
-	@Test
-	public void givenInputFolderOption_shouldReturnInputputFolder() throws Exception {
-		final String inputFolder = "/tmp/mp3";
-		Id3CharSetConverterParameters params = Id3CharSetConverterParameters.parse(new String[] {"-I", inputFolder});
-		assertEquals(inputFolder, params.getInputFolder().get());		
-				
-		params = Id3CharSetConverterParameters.parse(new String[] {"--input-folder", inputFolder});
-		assertEquals(inputFolder, params.getInputFolder().get());
-	}
 	
 	@Test
 	public void givenInputFolderWithArgs_shouldReturnArgs() throws Exception {
@@ -106,27 +97,17 @@ public class Id3CharSetConverterParametersTest {
 	
 	@Test
 	public void givenNoOutputFolderOption_shouldReturnNoOutputFolder() throws Exception {		
-		Id3CharSetConverterParameters params = Id3CharSetConverterParameters.parse(new String[] {});
+		Id3CharSetConverterParameters params = Id3CharSetConverterParameters.parse(new String[] {"-h"});
 		assertEquals(Optional.empty(), params.getOutputFolder());
-	}
-	
-	@Test
-	public void givenOutputFolderOption_shouldReturnOutputFolder() throws Exception {
-		final String outputFolder = "/tmp/output";
-		Id3CharSetConverterParameters params = Id3CharSetConverterParameters.parse(new String[] {"-O", outputFolder});
-		assertEquals(outputFolder, params.getOutputFolder().get());		
-				
-		params = Id3CharSetConverterParameters.parse(new String[] {"--output-folder", outputFolder});
-		assertEquals(outputFolder, params.getOutputFolder().get());
 	}
 	
 	@Test
 	public void givenOutputFolderWithArgs_shouldReturnArgs() throws Exception {
 		final String outputFolder = "/tmp/output";
-		Id3CharSetConverterParameters params = Id3CharSetConverterParameters.parse(new String[] {"-O", outputFolder});
+		Id3CharSetConverterParameters params = Id3CharSetConverterParameters.parse(new String[] {"-hO", outputFolder});
 		assertEquals(outputFolder, params.getOutputFolder().get());		
 				
-		params = Id3CharSetConverterParameters.parse(new String[] {"--output-folder", outputFolder});
+		params = Id3CharSetConverterParameters.parse(new String[] {"-h", "--output-folder", outputFolder});
 		assertEquals(outputFolder, params.getOutputFolder().get());
 	}
 	
