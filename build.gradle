@@ -40,3 +40,11 @@ dependencies {
 task wrapper(type: Wrapper) {
 	gradleVersion = '2.9'
 }
+
+test {
+	jacoco {
+		append = false
+		destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+		classDumpFile = file("$buildDir/jacoco/classpathdumps")
+	}
+}
