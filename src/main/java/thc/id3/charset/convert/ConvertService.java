@@ -1,4 +1,4 @@
-package thc.id3;
+package thc.id3.charset.convert;
 
 
 import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_ALBUM;
@@ -33,15 +33,15 @@ import com.mpatric.mp3agic.ID3v2FrameSet;
 import com.mpatric.mp3agic.Mp3File;
 
 
-public class Id3CharSetConvertService {
-	private static Logger log = LoggerFactory.getLogger(Id3CharSetConvertService.class);
+public class ConvertService {
+	private static Logger log = LoggerFactory.getLogger(ConvertService.class);
 		
 	private static final String DEFAULT_FROM_ENCODING = "big5";
 	private static final String DEFAULT_TO_ENCODING = "utf-8";
 	
-	private final Id3CharSetConverterParameters params;
+	private final Parameters params;
 	
-	public Id3CharSetConvertService(Id3CharSetConverterParameters params) {
+	public ConvertService(Parameters params) {
 		this.params = params;
 	}
 
