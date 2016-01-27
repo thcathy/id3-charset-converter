@@ -21,10 +21,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ui.ModelMap;
 
 import com.mpatric.mp3agic.EncodedText;
 import com.mpatric.mp3agic.ID3v2;
@@ -139,17 +137,4 @@ public class ConvertService {
 		byte[] utfBytes = new String(ArrayUtils.remove(frame.getData(), 0),"BIG5").trim().getBytes("UTF-8");	// remove leading byte and convert
         frame.setData(ArrayUtils.add(utfBytes, 0, EncodedText.TEXT_ENCODING_UTF_8));		
 	}
-
-	private boolean noInput(String action, String folder) {		
-		return StringUtils.isBlank(action) || StringUtils.isBlank(folder);
-	}
-
-	private void givenDefaultValue(ModelMap modelMap) {
-		modelMap.addAttribute("fromEncoding", DEFAULT_FROM_ENCODING);
-		modelMap.addAttribute("toEncoding", DEFAULT_TO_ENCODING);		
-	}
-
-	public void run() {
-		if (params.isHelp()) params.printHelp();
-	}	
 }

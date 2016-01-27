@@ -114,8 +114,7 @@ public class Parameters {
 		return commandLine.hasOption(OPTION_TO_CHARSET) ? commandLine.getOptionValue(OPTION_TO_CHARSET) : DEFAULT_TO_CHARSET;
 	}
 	
-	public void printHelp() {
-		HelpFormatter formatter = new HelpFormatter();
+	public static void printHelp(HelpFormatter formatter) {
 		formatter.printHelp( "java xxxxxxxxx", options);
 	}
 }

@@ -1,34 +1,31 @@
 package thc.id3;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
+import org.apache.commons.cli.HelpFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import thc.id3.charset.convert.Parameters;
 
 @RunWith(MockitoJUnitRunner.class)
 public class Id3CharSetConverterCommandTest {
 	
 	@Mock
-	Parameters params;
+	HelpFormatter formatter;
 	
 	@Test
 	public void givenArgsWithHelp_shouldPrintUsage() throws Exception {
-		// given 
-		when(params.isHelp()).thenReturn(true);
+		new Id3CharSetConverterCommand(formatter).run(new String[] {"-h"});
 		
-		new Id3CharSetConverterCommand(params).run();
-		
-		verify(params, times(1)).printHelp();
+		verify(formatter, times(1)).printHelp(Mockito.anyString(), Mockito.anyObject());
 	}
 	
 	@Test
-	public void givenNoArgs_shouldGivenException() throws Exception {
-		new Id3CharSetConverterCommand(Parameters.parse(new String[] {"-h"})).run();
+	public void givenNoArgs_shouldPrintUsage() throws Exception {
+		new Id3CharSetConverterCommand(formatter).run();
+		verify(formatter, times(1)).printHelp(Mockito.anyString(), Mockito.anyObject());
 	}
 	
 	
