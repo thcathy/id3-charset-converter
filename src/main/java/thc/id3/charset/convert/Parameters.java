@@ -12,10 +12,6 @@ import org.apache.commons.cli.Options;
 public class Parameters {
 	final static String OPTION_HELP = "help";
 	final static String OPTION_TEST = "test";
-	final static String OPTION_INPUT_FILE = "input-file";
-	final static String OPTION_OUTPUT_FILE = "output-file";	
-	final static String OPTION_INPUT_FOLDER = "input-folder";
-	final static String OPTION_OUTPUT_FOLDER = "output-folder";
 	final static String OPTION_FROM_CHARSET = "from-charset";
 	final static String OPTION_TO_CHARSET = "to-charset";
 	
@@ -34,26 +30,6 @@ public class Parameters {
 		Options options = new Options();
 		options.addOption("h", OPTION_HELP, false, "print help message");
 		options.addOption("t", OPTION_TEST, false, "test run without saving files");
-		options.addOption(Option.builder("i")
-						    .desc("input FILE to convert")
-						    .longOpt(OPTION_INPUT_FILE)
-						    .hasArg().argName("FILE")
-						    .build());
-		options.addOption(Option.builder("o")
-						    .desc("coverted and save as FILE")
-						    .longOpt(OPTION_OUTPUT_FILE)
-						    .hasArg().argName("FILE")
-						    .build());
-		options.addOption(Option.builder("I")
-						    .desc("input FOLDER, includes files and sub directories")
-						    .longOpt(OPTION_INPUT_FOLDER)
-						    .hasArg().argName("FOLDER")
-						    .build());
-		options.addOption(Option.builder("O")
-						    .desc("output FOLDER")
-						    .longOpt(OPTION_OUTPUT_FOLDER)
-						    .hasArg().argName("FOLDER")
-						    .build());
 		options.addOption(Option.builder("c")
 							.desc("input CHARSET, default=" + DEFAULT_FROM_CHARSET)
 							.longOpt(OPTION_FROM_CHARSET)
@@ -72,34 +48,34 @@ public class Parameters {
 		CommandLineParser parser = new DefaultParser();
 		Parameters params = new Parameters(parser.parse(options, args));
 		
-		if (params.noInputFileAndFolderAndHelp()) 
-			throw new MissingArgumentException("Require argument input file or input folder");
+		if (params.noSourcePathAndHelp()) 
+			throw new MissingArgumentException("Missing source file / folder");
 		else 
 			return params;
 	}
 
-	private boolean noInputFileAndFolderAndHelp() {
-		return !(this.getInputFile().isPresent() || this.getInputFolder().isPresent() || this.isHelp());
+	private boolean noSourcePathAndHelp() {
+		return !(this.getSourcePath().isPresent() || this.isHelp());
 	}
 
 	public boolean isHelp() {
 		return commandLine.hasOption(OPTION_HELP);
 	}
 	
-	public Optional<String> getInputFile() {
-		return Optional.ofNullable(commandLine.getOptionValue(OPTION_INPUT_FILE));
+	public Optional<String> getSourcePath() {
+		try {
+			return Optional.of(commandLine.getArgs()[0]);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return Optional.empty();
+		}
 	}
 	
-	public Optional<String> getOutputFile() {
-		return Optional.ofNullable(commandLine.getOptionValue(OPTION_OUTPUT_FILE));
-	}
-	
-	public Optional<String> getInputFolder() {
-		return Optional.ofNullable(commandLine.getOptionValue(OPTION_INPUT_FOLDER));
-	}
-	
-	public Optional<String> getOutputFolder() {
-		return Optional.ofNullable(commandLine.getOptionValue(OPTION_OUTPUT_FOLDER));
+	public Optional<String> getTargetPath() {
+		try {
+			return Optional.of(commandLine.getArgs()[1]);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return Optional.empty();
+		}
 	}
 	
 	public boolean isTest() {

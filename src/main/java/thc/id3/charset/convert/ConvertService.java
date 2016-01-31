@@ -37,12 +37,13 @@ public class ConvertService {
 	private static final String DEFAULT_FROM_ENCODING = "big5";
 	private static final String DEFAULT_TO_ENCODING = "utf-8";
 	
-	private final Parameters params;
-	
-	public ConvertService(Parameters params) {
-		this.params = params;
+	public Mp3File convertSingle(String inputFile, String outputFile, String fromEncoding, String toEncoding) {
+		log.debug("convertSingle: file[{}>{}], encoding[{}>{}]", inputFile, outputFile, fromEncoding, toEncoding);
+		
+		Mp3File convertedMp3 = convertTagsText(new File(inputFile), fromEncoding, toEncoding);
+		return save(convertedMp3, outputFile);
 	}
-
+	
 	public String convert(
 			String action,
 			String inputFolder,
@@ -64,6 +65,24 @@ public class ConvertService {
 											.map(f -> convertToMap(f))
 											.collect(Collectors.toList());
 		return "id3tag";
+	}
+	
+	private Mp3File save(Mp3File mp3, String outputFile) {
+		try {
+			mp3.save(outputFile);
+			mp3 = new Mp3File(outputFile);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			try {
+				mp3.getId3v2Tag().clearAlbumImage();
+				mp3.save(outputFile);
+				mp3 = new Mp3File(outputFile);
+			} catch (Exception e1) {
+				log.error("Cannot save mp3: " + mp3.getFilename(), e);
+			}
+		} catch (Exception e) {
+			log.error("Cannot save mp3: " + mp3.getFilename(), e);
+		}
+		return mp3;
 	}
 	
 	private Mp3File save(boolean isSave, Mp3File mp3, String outputFolder) {
@@ -134,7 +153,7 @@ public class ConvertService {
 		ID3v2FrameSet set = id3v2Tag.getFrameSets().get(tagId);
 		if (set == null) return;
 		ID3v2Frame frame = id3v2Tag.getFrameSets().get(tagId).getFrames().get(0);
-		byte[] utfBytes = new String(ArrayUtils.remove(frame.getData(), 0),"BIG5").trim().getBytes("UTF-8");	// remove leading byte and convert
+		byte[] utfBytes = new String(ArrayUtils.remove(frame.getData(), 0),fromEncoding).trim().getBytes(toEncoding);	// remove leading byte and convert
         frame.setData(ArrayUtils.add(utfBytes, 0, EncodedText.TEXT_ENCODING_UTF_8));		
 	}
 }
