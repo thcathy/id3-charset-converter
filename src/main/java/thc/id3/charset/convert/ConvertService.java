@@ -13,6 +13,7 @@ import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_TITLE;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -33,15 +34,37 @@ import com.mpatric.mp3agic.Mp3File;
 
 public class ConvertService {
 	private static Logger log = LoggerFactory.getLogger(ConvertService.class);
-		
-	private static final String DEFAULT_FROM_ENCODING = "big5";
-	private static final String DEFAULT_TO_ENCODING = "utf-8";
 	
-	public Mp3File convertSingle(String inputFile, String outputFile, String fromEncoding, String toEncoding) {
-		log.debug("convertSingle: file[{}>{}], encoding[{}>{}]", inputFile, outputFile, fromEncoding, toEncoding);
+	public void convert(String source, String target, String fromEncoding, String toEncoding) throws Exception {
+		log.debug("convertAll: path [{}>{}], encoding [{}>{}]", source, target, fromEncoding, toEncoding);
 		
-		Mp3File convertedMp3 = convertTagsText(new File(inputFile), fromEncoding, toEncoding);
-		return save(convertedMp3, outputFile);
+		Collection<File> files = collectFiles(source);
+		createTargetFolderIfNeeded(target);
+		
+		files.stream()
+				.map(f -> convertTagsText(f, fromEncoding, toEncoding))
+				.forEach(convertedMp3 -> save(convertedMp3, outputFile(target, toEncoding, convertedMp3.getFilename())));
+	}
+	
+	private Collection<File> collectFiles(String source) {
+		try {
+			return FileUtils.listFiles(new File(source), new String[]{"mp3"}, true);
+		} catch (Exception e) {
+			return Arrays.asList(new File(source));
+		}
+	}
+
+	private void createTargetFolderIfNeeded(String target) throws Exception {
+		if (!target.contains(".mp3"))  FileUtils.forceMkdir(new File(target));
+	}
+
+	private String outputFile(String target, String toEncoding, String originalFileName) {
+		if (target.endsWith(".mp3")) return target;
+		
+		int startPos = originalFileName.lastIndexOf("/");
+		int extPos = originalFileName.lastIndexOf(".");
+		String fileNameWithoutExt = originalFileName.substring(startPos, extPos);
+		return target + fileNameWithoutExt + "_" + toEncoding + ".mp3";
 	}
 	
 	public String convert(

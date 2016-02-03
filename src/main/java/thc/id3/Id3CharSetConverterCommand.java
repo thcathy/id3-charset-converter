@@ -26,7 +26,7 @@ public class Id3CharSetConverterCommand {
 			if (params.isHelp()) {
 				Parameters.printHelp(formatter);
 			} else {
-				convertService.convertSingle(params.getSourcePath().get(), params.getTargetPath().get(), params.getFromCharSet(), params.getToCharSet());
+				convertService.convert(params.getSourcePath().get(), params.getTargetPath().get(), params.getFromCharSet(), params.getToCharSet());
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage());

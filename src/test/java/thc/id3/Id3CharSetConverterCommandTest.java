@@ -40,7 +40,14 @@ public class Id3CharSetConverterCommandTest {
 	}
 	
 	@Test
-	public void givenInputFileAndOutputFile_shouldConvertId3AndSaveNewFile() throws Exception {
+	public void givenHelpAndInputFile_shouldPrintHelpOnly() throws Exception {
+		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-h", "abc"});
+		
+		verify(formatter, times(1)).printHelp(Mockito.anyString(), Mockito.anyObject());
+	}
+	
+	@Test
+	public void givenSourceFileAndTargetFile_shouldConvertId3AndSaveToTargetFile() throws Exception {
 		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
 		File f = new File(fileUri.getPath());
 		
@@ -56,5 +63,29 @@ public class Id3CharSetConverterCommandTest {
 		
 		// clean up
 		FileUtils.forceDelete(new File(outputFilePath));
+	}
+	
+	@Test
+	public void givenSourceFolderAndTargetFolder_shouldConvertAllFile() throws Exception {
+		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
+		String sourceFolder = new File(fileUri.getPath()).getParent();
+		String targetFolder = "tmp";
+		
+		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", sourceFolder, targetFolder});
+		
+		Mp3File mp3 = new Mp3File(targetFolder + "/big5_UTF-8.mp3");
+		ID3v2 tag = mp3.getId3v2Tag();
+		assertEquals("李克勤", tag.getArtist());
+		assertEquals("我克勤", tag.getAlbum());
+		assertEquals("戀愛為何物 (feat. AGA)", tag.getTitle());
+		
+		mp3 = new Mp3File(targetFolder + "/sub_folder_big5_UTF-8.mp3");
+		tag = mp3.getId3v2Tag();
+		assertEquals("李克勤", tag.getArtist());
+		assertEquals("我克勤", tag.getAlbum());
+		assertEquals("戀愛為何物 (feat. AGA)", tag.getTitle());
+		
+		// clean up
+		FileUtils.forceDelete(new File(targetFolder));
 	}
 }
