@@ -4,6 +4,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import org.apache.commons.cli.HelpFormatter;
@@ -15,7 +16,9 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.mpatric.mp3agic.ID3v2;
+import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
+import com.mpatric.mp3agic.UnsupportedTagException;
 
 import thc.id3.charset.convert.ConvertService;
 
@@ -49,20 +52,33 @@ public class Id3CharSetConverterCommandTest {
 	@Test
 	public void givenSourceFileAndTargetFile_shouldConvertId3AndSaveToTargetFile() throws Exception {
 		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
-		File f = new File(fileUri.getPath());
+		File f = new File(fileUri.getPath());		
+		String outputFilePath = f.getParent() + "/converted.mp3";
 		
-		String outputFilePath = f.getParent() + "/big5_utf8.mp3";
-		
-		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", fileUri.getPath(), outputFilePath});
-		
+		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", fileUri.getPath(), outputFilePath});		
+		checkMp3Tag(outputFilePath);
+				
+		FileUtils.forceDelete(new File(outputFilePath)); // clean up
+	}
+
+	private void checkMp3Tag(String outputFilePath) throws IOException, UnsupportedTagException, InvalidDataException {
 		Mp3File mp3 = new Mp3File(outputFilePath);
 		ID3v2 tag = mp3.getId3v2Tag();
 		assertEquals("李克勤", tag.getArtist());
 		assertEquals("我克勤", tag.getAlbum());
 		assertEquals("戀愛為何物 (feat. AGA)", tag.getTitle());
+	}
+	
+	@Test
+	public void givenSourceFileWithoutTargetFile_shouldConvertId3AndSaveToDefaultTargetFile() throws Exception {
+		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
+		File f = new File(fileUri.getPath());		
+		String outputFilePath = f.getParent() + "/big5_UTF-8.mp3";
 		
-		// clean up
-		FileUtils.forceDelete(new File(outputFilePath));
+		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", fileUri.getPath()});		
+		checkMp3Tag(outputFilePath);
+				
+		FileUtils.forceDelete(new File(outputFilePath)); // clean up
 	}
 	
 	@Test
@@ -72,18 +88,8 @@ public class Id3CharSetConverterCommandTest {
 		String targetFolder = "tmp";
 		
 		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", sourceFolder, targetFolder});
-		
-		Mp3File mp3 = new Mp3File(targetFolder + "/big5_UTF-8.mp3");
-		ID3v2 tag = mp3.getId3v2Tag();
-		assertEquals("李克勤", tag.getArtist());
-		assertEquals("我克勤", tag.getAlbum());
-		assertEquals("戀愛為何物 (feat. AGA)", tag.getTitle());
-		
-		mp3 = new Mp3File(targetFolder + "/sub_folder_big5_UTF-8.mp3");
-		tag = mp3.getId3v2Tag();
-		assertEquals("李克勤", tag.getArtist());
-		assertEquals("我克勤", tag.getAlbum());
-		assertEquals("戀愛為何物 (feat. AGA)", tag.getTitle());
+		checkMp3Tag(targetFolder + "/big5_UTF-8.mp3");
+		checkMp3Tag(targetFolder + "/sub_folder_big5_UTF-8.mp3");
 		
 		// clean up
 		FileUtils.forceDelete(new File(targetFolder));

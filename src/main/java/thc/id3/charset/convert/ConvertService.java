@@ -36,7 +36,7 @@ public class ConvertService {
 	private static Logger log = LoggerFactory.getLogger(ConvertService.class);
 	
 	public void convert(String source, String target, String fromEncoding, String toEncoding) throws Exception {
-		log.debug("convertAll: path [{}>{}], encoding [{}>{}]", source, target, fromEncoding, toEncoding);
+		log.info("convert: path [{} > {}], encoding [{} > {}]", source, target, fromEncoding, toEncoding);
 		
 		Collection<File> files = collectFiles(source);
 		createTargetFolderIfNeeded(target);
@@ -61,7 +61,7 @@ public class ConvertService {
 	private String outputFile(String target, String toEncoding, String originalFileName) {
 		if (target.endsWith(".mp3")) return target;
 		
-		int startPos = originalFileName.lastIndexOf("/");
+		int startPos = originalFileName.contains(File.separator) ? originalFileName.lastIndexOf(File.separator) : 0;
 		int extPos = originalFileName.lastIndexOf(".");
 		String fileNameWithoutExt = originalFileName.substring(startPos, extPos);
 		return target + fileNameWithoutExt + "_" + toEncoding + ".mp3";
@@ -74,7 +74,7 @@ public class ConvertService {
 			String fromEncoding,
 			String toEncoding) throws IOException {
 		
-		log.debug("convert: action[{}], folder[{}>{}], encoding[{}>{}]", action, inputFolder, outputFolder, fromEncoding, toEncoding);
+		log.debug("convert: action[{}], folder[{} > {}], encoding[{} > {}]", action, inputFolder, outputFolder, fromEncoding, toEncoding);
 		
 		
 		File folderObj = new File(inputFolder);

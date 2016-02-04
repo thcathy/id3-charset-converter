@@ -2,6 +2,7 @@ package thc.id3;
 
 
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,8 @@ public class Id3CharSetConverterCommand {
 	}
 
 	public void run(String... args) {
+		log.info("Start id3 character set converter");
+		
 		try {
 			Parameters params = Parameters.parse(args);
 			if (params.isHelp()) {
@@ -28,9 +31,11 @@ public class Id3CharSetConverterCommand {
 			} else {
 				convertService.convert(params.getSourcePath().get(), params.getTargetPath().get(), params.getFromCharSet(), params.getToCharSet());
 			}
-		} catch (Exception e) {
-			log.error(e.getMessage());
+		} catch (MissingArgumentException m) {
+			log.error(m.getMessage());
 			Parameters.printHelp(formatter);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 		}
 	}
 	
