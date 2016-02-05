@@ -35,6 +35,16 @@ import com.mpatric.mp3agic.Mp3File;
 public class ConvertService {
 	private static Logger log = LoggerFactory.getLogger(ConvertService.class);
 	
+	private static List<String> tagsToConvert = Arrays.asList(
+													ID_ARTIST,
+													ID_TITLE,
+													ID_ALBUM,
+													ID_COMPOSER,
+													ID_PUBLISHER,
+													ID_ORIGINAL_ARTIST,
+													ID_ALBUM_ARTIST,
+													ID_ENCODER);
+			
 	public void convert(String source, String target, String fromEncoding, String toEncoding) throws Exception {
 		log.info("convert: path [{} > {}], encoding [{} > {}]", source, target, fromEncoding, toEncoding);
 		
@@ -138,15 +148,8 @@ public class ConvertService {
 		
 		try {
 			Mp3File mp3 = new Mp3File(f);
-			ID3v2 id3v2Tag = mp3.getId3v2Tag();
-			decodeText(id3v2Tag, ID_ARTIST,fromEncoding, toEncoding);
-        	decodeText(id3v2Tag, ID_TITLE,fromEncoding, toEncoding);
-        	decodeText(id3v2Tag, ID_ALBUM,fromEncoding, toEncoding);
-        	decodeText(id3v2Tag, ID_COMPOSER,fromEncoding, toEncoding);
-        	decodeText(id3v2Tag, ID_PUBLISHER,fromEncoding, toEncoding);
-        	decodeText(id3v2Tag, ID_ORIGINAL_ARTIST,fromEncoding, toEncoding);
-        	decodeText(id3v2Tag, ID_ALBUM_ARTIST,fromEncoding, toEncoding);
-        	decodeText(id3v2Tag, ID_ENCODER, fromEncoding, toEncoding);
+			final ID3v2 id3v2Tag = mp3.getId3v2Tag();
+			tagsToConvert.forEach(tag -> decodeText(id3v2Tag, tag, fromEncoding, toEncoding));
         	return mp3;
 		} catch (Exception e) {
 			log.warn("Cannot process mp3: " + f.getAbsolutePath(), e);
@@ -172,11 +175,16 @@ public class ConvertService {
 		return tags;
 	}
 	
-	private void decodeText(ID3v2 id3v2Tag, String tagId, String fromEncoding, String toEncoding) throws UnsupportedEncodingException {
+	private void decodeText(ID3v2 id3v2Tag, String tagId, String fromEncoding, String toEncoding) {
 		ID3v2FrameSet set = id3v2Tag.getFrameSets().get(tagId);
 		if (set == null) return;
 		ID3v2Frame frame = id3v2Tag.getFrameSets().get(tagId).getFrames().get(0);
-		byte[] utfBytes = new String(ArrayUtils.remove(frame.getData(), 0),fromEncoding).trim().getBytes(toEncoding);	// remove leading byte and convert
-        frame.setData(ArrayUtils.add(utfBytes, 0, EncodedText.TEXT_ENCODING_UTF_8));		
+		
+		try {
+			byte[] utfBytes = new String(ArrayUtils.remove(frame.getData(), 0),fromEncoding).trim().getBytes(toEncoding);	// remove leading byte and convert
+			frame.setData(ArrayUtils.add(utfBytes, 0, EncodedText.TEXT_ENCODING_UTF_8));
+		} catch (UnsupportedEncodingException e) {
+			log.error("Cannot decode tag {} from {} to {}", tagId, fromEncoding, toEncoding);
+		}		
 	}
 }
