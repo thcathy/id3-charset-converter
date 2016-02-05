@@ -87,6 +87,47 @@ public class Id3CharSetConverterCommandTest {
 	}
 	
 	@Test
+	public void givenSourceFileAndTargetIsFolder_shouldConvertId3AndSaveToTargetFolder() throws Exception {
+		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
+		String targetFolder = "tmp";
+		String targetFilePath = targetFolder + "/big5_UTF-8.mp3";
+		
+		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", fileUri.getPath(), targetFolder});		
+		checkMp3Tag(targetFilePath);
+				
+		FileUtils.forceDelete(new File(targetFolder)); // clean up
+	}
+	
+	@Test
+	public void givenSourceFolderWithoutTargetFolder_shouldConvertId3AndSaveToSourceFolder() throws Exception {
+		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
+		String sourceFolder = new File(fileUri.getPath()).getParent();
+				
+		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", sourceFolder});
+		checkMp3Tag(sourceFolder + "/big5_UTF-8.mp3");
+		checkMp3Tag(sourceFolder + "/sub_folder_big5_UTF-8.mp3");
+		
+		// clean up
+		FileUtils.forceDelete(new File(sourceFolder + "/big5_UTF-8.mp3"));
+		FileUtils.forceDelete(new File(sourceFolder + "/sub_folder_big5_UTF-8.mp3"));
+	}
+	
+	@Test
+	public void givenSourceFolderAndTargetFile_shouldConvertId3AndSaveToTargetFileParent() throws Exception {
+		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
+		String sourceFolder = new File(fileUri.getPath()).getParent();
+		String targetFolder = "tmp";
+		String targetFilePath = targetFolder + "/big5_UTF-8.mp3";
+				
+		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", sourceFolder, targetFilePath});
+		checkMp3Tag(targetFolder + "/big5_UTF-8.mp3");
+		checkMp3Tag(targetFolder + "/sub_folder_big5_UTF-8.mp3");
+		
+		// clean up
+		FileUtils.forceDelete(new File(targetFolder));
+	}
+	
+	@Test
 	public void givenSourceFolderAndTargetFolder_shouldConvertAllFile() throws Exception {
 		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
 		String sourceFolder = new File(fileUri.getPath()).getParent();
@@ -99,6 +140,8 @@ public class Id3CharSetConverterCommandTest {
 		// clean up
 		FileUtils.forceDelete(new File(targetFolder));
 	}
+	
+	
 	
 	@SuppressWarnings("unchecked")
 	@Test

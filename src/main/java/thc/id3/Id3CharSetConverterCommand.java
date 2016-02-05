@@ -29,7 +29,10 @@ public class Id3CharSetConverterCommand {
 			if (params.isHelp()) {
 				Parameters.printHelp(formatter);
 			} else {
-				convertService.convert(params.getSourcePath().get(), params.getTargetPath().get(), params.getFromCharSet(), params.getToCharSet());
+				convertService.convert(params.getSourcePath().get(), 
+										params.getTargetPath().orElse(params.getSourcePath().get()), 
+										params.getFromCharSet(), 
+										params.getToCharSet());
 			}
 		} catch (MissingArgumentException m) {
 			log.error(m.getMessage());
