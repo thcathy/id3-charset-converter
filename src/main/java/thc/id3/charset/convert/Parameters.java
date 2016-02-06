@@ -79,7 +79,7 @@ public class Parameters {
 	}
 		
 	public static void printHelp(HelpFormatter formatter) {
-		formatter.printHelp("id3-charset-converter [-c <CHARSET>] [-h] [-t] source", "Convert the ID3 tags of all mp3 under source to UTF-8", options, "");
+		formatter.printHelp("id3-charset-converter [-c <CHARSET>] [-h] [-t] source [target]", "Convert the ID3 tags of all mp3 under source to UTF-8 and save to target", options, "");
 	}
 	
 	public static void main(String... args) {
