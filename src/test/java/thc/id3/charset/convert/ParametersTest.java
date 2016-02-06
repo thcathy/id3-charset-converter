@@ -88,6 +88,6 @@ public class ParametersTest {
 		assertEquals(charset, params.getCharSet());
 		
 		params = Parameters.parse(new String[] {"-h"});
-		assertEquals("ISO-8859-1", params.getCharSet());
+		assertEquals("BIG5", params.getCharSet());
 	}
 }

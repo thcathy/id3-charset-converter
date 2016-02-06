@@ -34,20 +34,20 @@ public class Id3CharSetConverterCommandTest {
 	public void givenArgsWithHelp_shouldPrintUsage() throws Exception {
 		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-h"});
 		
-		verify(formatter, times(1)).printHelp(Mockito.anyString(), Mockito.anyObject());
+		verify(formatter, times(1)).printHelp(Mockito.anyString(), Mockito.anyObject(), Mockito.anyObject(), Mockito.anyObject());
 	}
 	
 	@Test
 	public void givenNoArgs_shouldPrintUsage() throws Exception {
 		new Id3CharSetConverterCommand(formatter, convertService).run();
-		verify(formatter, times(1)).printHelp(Mockito.anyString(), Mockito.anyObject());
+		verify(formatter, times(1)).printHelp(Mockito.anyString(), Mockito.anyObject(), Mockito.anyObject(), Mockito.anyObject());
 	}
 	
 	@Test
 	public void givenHelpAndInputFile_shouldPrintHelpOnly() throws Exception {
 		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-h", "abc"});
 		
-		verify(formatter, times(1)).printHelp(Mockito.anyString(), Mockito.anyObject());
+		verify(formatter, times(1)).printHelp(Mockito.anyString(), Mockito.anyObject(), Mockito.anyObject(), Mockito.anyObject());
 	}
 	
 	@Test

@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import thc.id3.charset.convert.ConvertService;
 import thc.id3.charset.convert.Parameters;
 
-
 public class Id3CharSetConverterCommand {
 	private static Logger log = LoggerFactory.getLogger(Id3CharSetConverterCommand.class);
 	
@@ -21,7 +20,7 @@ public class Id3CharSetConverterCommand {
 		this.convertService = convertService;
 	}
 
-	public void run(String... args) {
+	public int run(String... args) {
 		log.info("Start id3 character set converter");
 		
 		try {
@@ -36,12 +35,15 @@ public class Id3CharSetConverterCommand {
 		} catch (MissingArgumentException m) {
 			log.error(m.getMessage());
 			Parameters.printHelp(formatter);
+			return 1;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
+			return 1;
 		}
+		return 0;
 	}
 	
 	public static void main(String[] args) throws Exception {
-		
+		new Id3CharSetConverterCommand(new HelpFormatter(), new ConvertService()).run(args);
 	}
 }

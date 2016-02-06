@@ -14,11 +14,14 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'spring-boot' 
+apply plugin: 'application'
 
 jar {
 	baseName = 'Id3CharSetConverter'
 	version = '0.0.1-SNAPSHOT'
 }
+
+mainClassName = "thc.id3.Id3CharSetConverterCommand"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

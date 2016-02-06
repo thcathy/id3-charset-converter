@@ -14,7 +14,7 @@ public class Parameters {
 	final static String OPTION_TEST = "test";
 	final static String OPTION_CHARSET = "charset";
 	
-	final static String DEFAULT_CHARSET = "ISO-8859-1";
+	final static String DEFAULT_CHARSET = "BIG5";
 	
 	final static Options options = buildOptions();
 	
@@ -29,7 +29,7 @@ public class Parameters {
 		options.addOption("h", OPTION_HELP, false, "print help message");
 		options.addOption("t", OPTION_TEST, false, "test run without saving files");
 		options.addOption(Option.builder("c")
-							.desc("input CHARSET, default=" + DEFAULT_CHARSET)
+							.desc("source CHARSET, default=" + DEFAULT_CHARSET)
 							.longOpt(OPTION_CHARSET)
 							.hasArg().argName("CHARSET")
 							.build());		
@@ -79,7 +79,11 @@ public class Parameters {
 	}
 		
 	public static void printHelp(HelpFormatter formatter) {
-		formatter.printHelp( "java xxxxxxxxx", options);
+		formatter.printHelp("id3-charset-converter [-c <CHARSET>] [-h] [-t] source", "Convert the ID3 tags of all mp3 under source to UTF-8", options, "");
+	}
+	
+	public static void main(String... args) {
+		Parameters.printHelp(new HelpFormatter());
 	}
 }
 
