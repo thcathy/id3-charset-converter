@@ -12,11 +12,9 @@ import org.apache.commons.cli.Options;
 public class Parameters {
 	final static String OPTION_HELP = "help";
 	final static String OPTION_TEST = "test";
-	final static String OPTION_FROM_CHARSET = "from-charset";
-	final static String OPTION_TO_CHARSET = "to-charset";
+	final static String OPTION_CHARSET = "charset";
 	
-	final static String DEFAULT_FROM_CHARSET = "ISO-8859-1";
-	final static String DEFAULT_TO_CHARSET = "UTF-8";
+	final static String DEFAULT_CHARSET = "ISO-8859-1";
 	
 	final static Options options = buildOptions();
 	
@@ -31,16 +29,10 @@ public class Parameters {
 		options.addOption("h", OPTION_HELP, false, "print help message");
 		options.addOption("t", OPTION_TEST, false, "test run without saving files");
 		options.addOption(Option.builder("c")
-							.desc("input CHARSET, default=" + DEFAULT_FROM_CHARSET)
-							.longOpt(OPTION_FROM_CHARSET)
+							.desc("input CHARSET, default=" + DEFAULT_CHARSET)
+							.longOpt(OPTION_CHARSET)
 							.hasArg().argName("CHARSET")
-							.build());
-		options.addOption(Option.builder("C")
-							.desc("output CHARSET, default=" + DEFAULT_TO_CHARSET)
-							.longOpt(OPTION_TO_CHARSET)
-							.hasArg().argName("CHARSET")
-							.build());
-		
+							.build());		
 		return options;
 	}
 
@@ -82,14 +74,10 @@ public class Parameters {
 		return commandLine.hasOption(OPTION_TEST);
 	}
 	
-	public String getFromCharSet() {
-		return commandLine.hasOption(OPTION_FROM_CHARSET) ? commandLine.getOptionValue(OPTION_FROM_CHARSET) : DEFAULT_FROM_CHARSET;
+	public String getCharSet() {
+		return commandLine.hasOption(OPTION_CHARSET) ? commandLine.getOptionValue(OPTION_CHARSET) : DEFAULT_CHARSET;
 	}
-	
-	public String getToCharSet() {
-		return commandLine.hasOption(OPTION_TO_CHARSET) ? commandLine.getOptionValue(OPTION_TO_CHARSET) : DEFAULT_TO_CHARSET;
-	}
-	
+		
 	public static void printHelp(HelpFormatter formatter) {
 		formatter.printHelp( "java xxxxxxxxx", options);
 	}

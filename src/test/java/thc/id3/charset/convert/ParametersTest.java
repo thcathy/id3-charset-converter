@@ -79,28 +79,15 @@ public class ParametersTest {
 	}
 	
 	@Test
-	public void givenFromCharSet_shouldReturnArgsOrDefault() throws Exception {
-		final String fromCharSet = "big5";
-		Parameters params = Parameters.parse(new String[] {"-hc", fromCharSet});
-		assertEquals(fromCharSet, params.getFromCharSet());
+	public void givenCharSet_shouldReturnArgsOrDefault() throws Exception {
+		final String charset = "big5";
+		Parameters params = Parameters.parse(new String[] {"-hc", charset});
+		assertEquals(charset, params.getCharSet());
 		
-		params = Parameters.parse(new String[] {"--from-charset", fromCharSet, "source", "target"});
-		assertEquals(fromCharSet, params.getFromCharSet());
-		
-		params = Parameters.parse(new String[] {"-h"});
-		assertEquals("ISO-8859-1", params.getFromCharSet());
-	}
-
-	@Test
-	public void givenToCharSet_shouldReturnArgsOrDefault() throws Exception {
-		final String toCharSet = "big5";
-		Parameters params = Parameters.parse(new String[] {"-hC", toCharSet});
-		assertEquals(toCharSet, params.getToCharSet());
-		
-		params = Parameters.parse(new String[] {"--to-charset", toCharSet, "source", "target"});
-		assertEquals(toCharSet, params.getToCharSet());
+		params = Parameters.parse(new String[] {"--charset", charset, "source", "target"});
+		assertEquals(charset, params.getCharSet());
 		
 		params = Parameters.parse(new String[] {"-h"});
-		assertEquals("UTF-8", params.getToCharSet());
+		assertEquals("ISO-8859-1", params.getCharSet());
 	}
 }

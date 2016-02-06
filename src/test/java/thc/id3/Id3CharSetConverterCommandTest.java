@@ -143,7 +143,7 @@ public class Id3CharSetConverterCommandTest {
 		String sourceFolder = new File(fileUri.getPath()).getParent();
 		String targetFolder = "tmp";
 		
-		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", sourceFolder, targetFolder});
+		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-tc", "big5", sourceFolder, targetFolder});
 		assertFalse(new File(targetFolder + "/big5_UTF-8.mp3").exists());
 		assertFalse(new File(targetFolder + "/sub_folder_big5_UTF-8.mp3").exists());
 		
