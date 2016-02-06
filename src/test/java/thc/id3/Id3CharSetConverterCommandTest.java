@@ -1,5 +1,6 @@
 package thc.id3;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -11,20 +12,15 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.LoggerFactory;
 
 import com.mpatric.mp3agic.ID3v2;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
 
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.LoggingEvent;
-import ch.qos.logback.core.Appender;
 import thc.id3.charset.convert.ConvertService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -141,29 +137,17 @@ public class Id3CharSetConverterCommandTest {
 		FileUtils.forceDelete(new File(targetFolder));
 	}
 	
-	
-	
-	@SuppressWarnings("unchecked")
 	@Test
-    public void testLogging() throws Exception {
-		Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-		final Appender mockAppender = Mockito.mock(Appender.class);
-		Mockito.when(mockAppender.getName()).thenReturn("MOCK");
-		root.addAppender(mockAppender);
-
+	public void givenTestWithSourceFolder_shouldNotSaveFile() throws Exception {
 		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
-		File f = new File(fileUri.getPath());
+		String sourceFolder = new File(fileUri.getPath()).getParent();
+		String targetFolder = "tmp";
 		
-		String outputFilePath = f.getParent() + "/big5_utf8.mp3";
+		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", sourceFolder, targetFolder});
+		assertFalse(new File(targetFolder + "/big5_UTF-8.mp3").exists());
+		assertFalse(new File(targetFolder + "/sub_folder_big5_UTF-8.mp3").exists());
 		
-		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", fileUri.getPath(), outputFilePath});
-		FileUtils.forceDelete(new File(outputFilePath));
-
-	    verify(mockAppender).doAppend(Mockito.argThat(new ArgumentMatcher() {
-		      @Override
-		      public boolean matches(final Object argument) {
-		        return ((LoggingEvent)argument).getFormattedMessage().contains("convertTagsText file: /Users/thcathy/git/id3-charset-converter/bin/mp3/big5.mp3");
-		      }
-	    }));
+		// clean up
+		FileUtils.forceDelete(new File(targetFolder));
 	}
 }

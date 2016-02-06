@@ -10,15 +10,10 @@ import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_PUBLISHER;
 import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_TITLE;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -67,25 +62,8 @@ public class ConvertService {
 		return target.endsWith(".mp3");
 	}
 
-	public String convert(String action, String inputFolder, String outputFolder, String fromEncoding,
-			String toEncoding) throws IOException {
-
-		log.debug("convert: action[{}], folder[{} > {}], encoding[{} > {}]", action, inputFolder, outputFolder,
-				fromEncoding, toEncoding);
-
-		File folderObj = new File(inputFolder);
-		if (!folderObj.isDirectory())
-			inputFolder = folderObj.getParent();
-		Collection<File> files = FileUtils.listFiles(new File(inputFolder), new String[] { "mp3" }, true);
-
-		List<Map<String, String>> tags = files.stream().map(f -> convertTagsText(f, fromEncoding, toEncoding))
-				.filter(f -> f != null).map(f -> save("save".equalsIgnoreCase(action), f, outputFolder))
-				.map(f -> convertToMap(f)).collect(Collectors.toList());
-		return "id3tag";
-	}
-
 	private Mp3File save(Mp3File mp3, String outputFile) {
-		log.info("Saving {}", outputFile);
+		log.info("Saving mp3 to {}", outputFile);
 
 		try {
 			mp3.save(outputFile);
@@ -104,39 +82,15 @@ public class ConvertService {
 		return mp3;
 	}
 
-	private Mp3File save(boolean isSave, Mp3File mp3, String outputFolder) {
-		if (isSave) {
-			File outputFolderObj = new File(outputFolder);
-			String newFilePath = outputFolder + File.separator + new File(mp3.getFilename()).getName();
-			try {
-				if (!outputFolderObj.exists())
-					Files.createDirectories(outputFolderObj.toPath());
-
-				mp3.save(newFilePath);
-				mp3 = new Mp3File(newFilePath);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				try {
-					mp3.getId3v2Tag().clearAlbumImage();
-					mp3.save(newFilePath);
-					mp3 = new Mp3File(newFilePath);
-				} catch (Exception e1) {
-					log.error("Cannot save mp3: " + mp3.getFilename(), e);
-				}
-			} catch (Exception e) {
-				log.error("Cannot save mp3: " + mp3.getFilename(), e);
-			}
-		}
-
-		return mp3;
-	}
-
 	private Mp3File convertTagsText(File f, String fromEncoding, String toEncoding) {
-		log.debug("convertTagsText file: {}", f.getAbsoluteFile());
+		log.info("convert file: {}", f.getAbsoluteFile());
 
 		try {
 			Mp3File mp3 = new Mp3File(f);
 			final ID3v2 id3v2Tag = mp3.getId3v2Tag();
 			tagsToConvert.forEach(tag -> decodeText(id3v2Tag, tag, fromEncoding, toEncoding));
+			logTag(id3v2Tag);
+
 			return mp3;
 		} catch (Exception e) {
 			log.warn("Cannot process mp3: " + f.getAbsolutePath(), e);
@@ -144,22 +98,15 @@ public class ConvertService {
 		}
 	}
 
-	private Map<String, String> convertToMap(Mp3File f) {
-		Map<String, String> tags = new HashMap<>();
-		tags.put("FilePath", f.getFilename());
-
-		ID3v2 id3v2Tag = f.getId3v2Tag();
-		tags.put(ID_ARTIST, id3v2Tag.getArtist());
-		tags.put(ID_TITLE, id3v2Tag.getTitle());
-		tags.put(ID_ALBUM, id3v2Tag.getAlbum());
-		tags.put(ID_COMPOSER, id3v2Tag.getComposer());
-		tags.put(ID_PUBLISHER, id3v2Tag.getPublisher());
-		tags.put(ID_ORIGINAL_ARTIST, id3v2Tag.getOriginalArtist());
-		tags.put(ID_ALBUM_ARTIST, id3v2Tag.getAlbumArtist());
-		tags.put(ID_ENCODER, id3v2Tag.getEncoder());
-
-		log.debug(tags.toString());
-		return tags;
+	private void logTag(ID3v2 tag) {		
+		log.info("Artist: {}", tag.getArtist());
+		log.info("Title: {}", tag.getTitle());
+		log.info("Album: {}", tag.getAlbum());
+		log.info("Compose: {}", tag.getComposer());
+		log.info("Publisher: {}", tag.getPublisher());
+		log.info("Original Artist: {}", tag.getOriginalArtist());
+		log.info("Album Artist: {}", tag.getAlbumArtist());
+		log.info("Encoder: {}", tag.getEncoder());
 	}
 
 	private void decodeText(ID3v2 id3v2Tag, String tagId, String fromEncoding, String toEncoding) {
