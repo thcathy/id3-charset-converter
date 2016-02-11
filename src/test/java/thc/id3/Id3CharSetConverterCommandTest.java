@@ -57,17 +57,24 @@ public class Id3CharSetConverterCommandTest {
 		String outputFilePath = f.getParent() + "/converted.mp3";
 		
 		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", fileUri.getPath(), outputFilePath});		
-		checkMp3Tag(outputFilePath);
+		checkBig5Mp3Tag(outputFilePath);
 				
 		FileUtils.forceDelete(new File(outputFilePath)); // clean up
 	}
 
-	private void checkMp3Tag(String outputFilePath) throws IOException, UnsupportedTagException, InvalidDataException {
+	private void checkBig5Mp3Tag(String outputFilePath) throws IOException, UnsupportedTagException, InvalidDataException {
 		Mp3File mp3 = new Mp3File(outputFilePath);
 		ID3v2 tag = mp3.getId3v2Tag();
 		assertEquals("李克勤", tag.getArtist());
 		assertEquals("我克勤", tag.getAlbum());
 		assertEquals("戀愛為何物 (feat. AGA)", tag.getTitle());
+	}
+	
+	private void checkBig5bMp3Tag(String outputFilePath) throws IOException, UnsupportedTagException, InvalidDataException {
+		Mp3File mp3 = new Mp3File(outputFilePath);
+		ID3v2 tag = mp3.getId3v2Tag();
+		assertEquals("謝安琪", tag.getArtist());
+		assertEquals("山林道", tag.getTitle());
 	}
 	
 	@Test
@@ -77,7 +84,7 @@ public class Id3CharSetConverterCommandTest {
 		String outputFilePath = f.getParent() + "/big5_UTF-8.mp3";
 		
 		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", fileUri.getPath()});		
-		checkMp3Tag(outputFilePath);
+		checkBig5Mp3Tag(outputFilePath);
 				
 		FileUtils.forceDelete(new File(outputFilePath)); // clean up
 	}
@@ -89,7 +96,7 @@ public class Id3CharSetConverterCommandTest {
 		String targetFilePath = targetFolder + "/big5_UTF-8.mp3";
 		
 		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", fileUri.getPath(), targetFolder});		
-		checkMp3Tag(targetFilePath);
+		checkBig5Mp3Tag(targetFilePath);
 				
 		FileUtils.forceDelete(new File(targetFolder)); // clean up
 	}
@@ -99,13 +106,14 @@ public class Id3CharSetConverterCommandTest {
 		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
 		String sourceFolder = new File(fileUri.getPath()).getParent();
 				
-		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", sourceFolder});
-		checkMp3Tag(sourceFolder + "/big5_UTF-8.mp3");
-		checkMp3Tag(sourceFolder + "/sub_folder_big5_UTF-8.mp3");
-		
-		// clean up
-		FileUtils.forceDelete(new File(sourceFolder + "/big5_UTF-8.mp3"));
-		FileUtils.forceDelete(new File(sourceFolder + "/sub_folder_big5_UTF-8.mp3"));
+		try {
+			new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", sourceFolder});
+			checkBig5Mp3Tag(sourceFolder + "/big5_UTF-8.mp3");
+			checkBig5Mp3Tag(sourceFolder + "/sub_folder_big5_UTF-8.mp3");
+		} finally {
+			FileUtils.forceDelete(new File(sourceFolder + "/big5_UTF-8.mp3"));
+			FileUtils.forceDelete(new File(sourceFolder + "/sub_folder_big5_UTF-8.mp3"));
+		}
 	}
 	
 	@Test
@@ -115,12 +123,13 @@ public class Id3CharSetConverterCommandTest {
 		String targetFolder = "tmp";
 		String targetFilePath = targetFolder + "/big5_UTF-8.mp3";
 				
-		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", sourceFolder, targetFilePath});
-		checkMp3Tag(targetFolder + "/big5_UTF-8.mp3");
-		checkMp3Tag(targetFolder + "/sub_folder_big5_UTF-8.mp3");
-		
-		// clean up
-		FileUtils.forceDelete(new File(targetFolder));
+		try {
+			new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", sourceFolder, targetFilePath});
+			checkBig5Mp3Tag(targetFolder + "/big5_UTF-8.mp3");
+			checkBig5Mp3Tag(targetFolder + "/sub_folder_big5_UTF-8.mp3");
+		} finally {
+			FileUtils.forceDelete(new File(targetFolder));	// cleanup
+		}
 	}
 	
 	@Test
@@ -129,12 +138,13 @@ public class Id3CharSetConverterCommandTest {
 		String sourceFolder = new File(fileUri.getPath()).getParent();
 		String targetFolder = "tmp";
 		
-		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", sourceFolder, targetFolder});
-		checkMp3Tag(targetFolder + "/big5_UTF-8.mp3");
-		checkMp3Tag(targetFolder + "/sub_folder_big5_UTF-8.mp3");
-		
-		// clean up
-		FileUtils.forceDelete(new File(targetFolder));
+		try {
+			new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", sourceFolder, targetFolder});
+			checkBig5Mp3Tag(targetFolder + "/big5_UTF-8.mp3");
+			checkBig5Mp3Tag(targetFolder + "/sub_folder_big5_UTF-8.mp3");
+		} finally {
+			FileUtils.forceDelete(new File(targetFolder)); // cleanup
+		}
 	}
 	
 	@Test
@@ -153,12 +163,12 @@ public class Id3CharSetConverterCommandTest {
 	
 	@Test
 	public void givenSourceFileWithoutCharset_shouldConvertByAutoDetect() throws Exception {
-		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
+		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5_b.mp3");
 		String targetFolder = "tmp";
-		String targetFilePath = targetFolder + "/big5_UTF-8.mp3";
+		String targetFilePath = targetFolder + "/big5_b_UTF-8.mp3";
 		
 		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {fileUri.getPath(), targetFolder});		
-		checkMp3Tag(targetFilePath);
+		checkBig5bMp3Tag(targetFilePath);
 				
 		FileUtils.forceDelete(new File(targetFolder)); // clean up
 	}
