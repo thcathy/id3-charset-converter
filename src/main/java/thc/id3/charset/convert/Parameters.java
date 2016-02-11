@@ -27,7 +27,7 @@ public class Parameters {
 		options.addOption("h", OPTION_HELP, false, "print help message");
 		options.addOption("t", OPTION_TEST, false, "test run without saving files");
 		options.addOption(Option.builder("c")
-							.desc("source CHARSET, auto-detected if not specify")
+							.desc("source CHARSET\n auto-detected by title if not specify\n ! Detection is not 100% correct, suggest test run before saving file")
 							.longOpt(OPTION_CHARSET)
 							.hasArg().argName("CHARSET")
 							.build());		

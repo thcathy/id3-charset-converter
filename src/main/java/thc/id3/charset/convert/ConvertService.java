@@ -4,6 +4,7 @@ import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_ALBUM;
 import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_ALBUM_ARTIST;
 import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_ARTIST;
 import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_COMPOSER;
+import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_COPYRIGHT;
 import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_ENCODER;
 import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_ORIGINAL_ARTIST;
 import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_PUBLISHER;
@@ -14,12 +15,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ibm.icu.text.CharsetDetector;
 import com.mpatric.mp3agic.EncodedText;
 import com.mpatric.mp3agic.ID3v2;
 import com.mpatric.mp3agic.ID3v2Frame;
@@ -32,18 +35,18 @@ public class ConvertService {
 	public static String TO_CHARSET = "UTF-8";
 
 	private static List<String> tagsToConvert = Arrays.asList(ID_ARTIST, ID_TITLE, ID_ALBUM, ID_COMPOSER, ID_PUBLISHER,
-			ID_ORIGINAL_ARTIST, ID_ALBUM_ARTIST, ID_ENCODER);
+			ID_ORIGINAL_ARTIST, ID_ALBUM_ARTIST, ID_ENCODER, ID_COPYRIGHT);
 
-	public void convert(String source, String target, String charset, boolean isSave) throws Exception {
-		log.info("convert: path [{} > {}], encoding [{}]", source, target, charset);
+	public void convert(String source, String target, Optional<String> inputCharset, boolean isSave) throws Exception {
+		log.info("convert: path [{} > {}], encoding [{}]", source, target, inputCharset.orElse(""));
 
-		Collection<File> files = collectFiles(source);
-		createTargetFolderIfNeeded(target);
-		TargetFilePathMaker tgtPathMaker = createTargetFilePathMaker(source, target);
+		Collection<File> files = collectFiles(source);		
+		TargetPathFactory tgtPathFactory = TargetPathFactory.getFactory(source, target, TO_CHARSET);
+		tgtPathFactory.createFolder();
 
-		files.stream().map(f -> convertTagsData(f, charset))
+		files.stream().map(f -> convertTagsData(f, inputCharset))
 				.filter(x -> isSave)
-				.forEach(convertedMp3 -> save(convertedMp3, tgtPathMaker.makeFilePath(convertedMp3.getFilename())));
+				.forEach(convertedMp3 -> save(convertedMp3, tgtPathFactory.makeFilePath(convertedMp3.getFilename())));
 	}
 
 	private Collection<File> collectFiles(String source) {
@@ -52,17 +55,6 @@ public class ConvertService {
 		} catch (Exception e) {
 			return Arrays.asList(new File(source));
 		}
-	}
-
-	private void createTargetFolderIfNeeded(String target) throws Exception {
-		if (isFile(target))
-			FileUtils.forceMkdir(new File(target).getParentFile());
-		else
-			FileUtils.forceMkdir(new File(target));
-	}
-
-	private static boolean isFile(String target) {
-		return target.endsWith(".mp3");
 	}
 
 	private Mp3File save(Mp3File mp3, String outputFile) {
@@ -85,12 +77,13 @@ public class ConvertService {
 		return mp3;
 	}
 
-	private Mp3File convertTagsData(File f, String charset) {
+	private Mp3File convertTagsData(File f, Optional<String> inputCharset) {
 		log.info("convert file: {}", f.getAbsoluteFile());
 
 		try {
 			Mp3File mp3 = new Mp3File(f);
 			final ID3v2 id3v2Tag = mp3.getId3v2Tag();
+			String charset = inputCharset.orElseGet(() -> detectCharsetByTitle(id3v2Tag));
 			tagsToConvert.forEach(tag -> decodeText(id3v2Tag, tag, charset));
 			logTag(id3v2Tag);
 
@@ -99,6 +92,14 @@ public class ConvertService {
 			log.warn("Cannot process mp3: " + f.getAbsolutePath(), e);
 			return null;
 		}
+	}
+
+	private String detectCharsetByTitle(ID3v2 id3v2Tag) {
+		String charset =  new CharsetDetector()
+							.setText(ArrayUtils.remove(id3v2Tag.getFrameSets().get(ID_TITLE).getFrames().get(0).getData(), 0))
+							.detect().getName();
+		log.info("Auto Detected Charset: {}", charset);
+		return charset;
 	}
 
 	private void logTag(ID3v2 tag) {		
@@ -110,6 +111,7 @@ public class ConvertService {
 		log.info("Original Artist: {}", tag.getOriginalArtist());
 		log.info("Album Artist: {}", tag.getAlbumArtist());
 		log.info("Encoder: {}", tag.getEncoder());
+		log.info("Copyright: {}", tag.getCopyright());
 	}
 
 	private void decodeText(ID3v2 id3v2Tag, String tagId, String charset) {
@@ -123,49 +125,6 @@ public class ConvertService {
 			frame.setData(ArrayUtils.add(utfBytes, 0, EncodedText.TEXT_ENCODING_UTF_8));
 		} catch (UnsupportedEncodingException e) {
 			log.error("Cannot decode tag {} from {} to {}", tagId, charset, TO_CHARSET);
-		}
-	}
-
-	public TargetFilePathMaker createTargetFilePathMaker(String src, String tgt) {
-		if (isFile(src) && isFile(tgt) && !src.equals(tgt))
-			return new DirectInput(tgt);
-
-		String tgtPath = isFile(tgt) ? new File(tgt).getParent().toString() : tgt;
-		return new ConcatInput(tgtPath);
-	}
-	
-	abstract class TargetFilePathMaker {
-		final String path;
-		
-		TargetFilePathMaker(String path) {
-			this.path = path;
-		}
-	
-		abstract String makeFilePath(String source);
-	}
-	
-	class DirectInput extends TargetFilePathMaker {
-		public DirectInput(String path) {
-			super(path);
-		}
-	
-		@Override
-		String makeFilePath(String source) {
-			return path;
-		}
-	}
-	
-	class ConcatInput extends TargetFilePathMaker {
-		ConcatInput(String path) {
-			super(path);
-		}
-	
-		@Override
-		String makeFilePath(String source) {
-			int startPos = source.contains(File.separator) ? source.lastIndexOf(File.separator) : 0;
-			int extPos = source.lastIndexOf(".");
-			String fileNameWithoutExt = source.substring(startPos, extPos);
-			return path + fileNameWithoutExt + "_" + TO_CHARSET + ".mp3";
 		}
 	}
 }

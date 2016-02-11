@@ -150,4 +150,16 @@ public class Id3CharSetConverterCommandTest {
 		// clean up
 		FileUtils.forceDelete(new File(targetFolder));
 	}
+	
+	@Test
+	public void givenSourceFileWithoutCharset_shouldConvertByAutoDetect() throws Exception {
+		URL fileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
+		String targetFolder = "tmp";
+		String targetFilePath = targetFolder + "/big5_UTF-8.mp3";
+		
+		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {fileUri.getPath(), targetFolder});		
+		checkMp3Tag(targetFilePath);
+				
+		FileUtils.forceDelete(new File(targetFolder)); // clean up
+	}
 }
