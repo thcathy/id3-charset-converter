@@ -1,5 +1,5 @@
 # id3-charset-converter
-A Java command line application to covert charset of id3 tags to UTF-8.
+A Java command line application to covert charset of id3 tags to UTF-8. Support auto charset detection and batch convertion.
 
 ## About
 Some of the media players, for example iTunes, support character set UTF-8 only. Create this simple tool to convert the tags' character set to UTF-8.
@@ -25,7 +25,7 @@ Some of the media players, for example iTunes, support character set UTF-8 only.
 
   - __source (required):__ path of source file or folder
   - __target (optional):__ path of output file or folder
-  - __-c or --charset:__ source CHARSET, default=BIG5
+  - __-c or --charset:__ source CHARSET, auto-detected by title if not specify (! Detection is not 100% correct, suggest run __--test__ before saving file)
   - __-t or --test:__ test run without saving file(s)
   - __-h or --help:__ print help message
   
@@ -43,3 +43,10 @@ Some of the media players, for example iTunes, support character set UTF-8 only.
 This is a personal project by [Timmy Wong](https://github.com/thcathy). The project is adopted TDD with code coverage almost 100%.
 
 Feel free to contact me if you want any new feature or bug fixing.
+
+## Dependency ##
+https://github.com/mpatric/mp3agic
+mp3agic: reading and writing id3 tags
+
+http://site.icu-project.org/
+ICU4J: auto character set detection
