@@ -13,9 +13,7 @@ public class Parameters {
 	final static String OPTION_HELP = "help";
 	final static String OPTION_TEST = "test";
 	final static String OPTION_CHARSET = "charset";
-	
-	final static String DEFAULT_CHARSET = "BIG5";
-	
+		
 	final static Options options = buildOptions();
 	
 	final CommandLine commandLine; 
@@ -29,7 +27,7 @@ public class Parameters {
 		options.addOption("h", OPTION_HELP, false, "print help message");
 		options.addOption("t", OPTION_TEST, false, "test run without saving files");
 		options.addOption(Option.builder("c")
-							.desc("source CHARSET, default=" + DEFAULT_CHARSET)
+							.desc("source CHARSET, auto-detected if not specify")
 							.longOpt(OPTION_CHARSET)
 							.hasArg().argName("CHARSET")
 							.build());		
@@ -74,8 +72,8 @@ public class Parameters {
 		return commandLine.hasOption(OPTION_TEST);
 	}
 	
-	public String getCharSet() {
-		return commandLine.hasOption(OPTION_CHARSET) ? commandLine.getOptionValue(OPTION_CHARSET) : DEFAULT_CHARSET;
+	public Optional<String> getCharSet() {
+		return Optional.ofNullable(commandLine.getOptionValue(OPTION_CHARSET));
 	}
 		
 	public static void printHelp(HelpFormatter formatter) {

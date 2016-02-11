@@ -30,7 +30,7 @@ public class Id3CharSetConverterCommand {
 			} else {
 				convertService.convert(params.getSourcePath().get(), 
 										params.getTargetPath().orElse(params.getSourcePath().get()), 
-										params.getCharSet(), !params.isTest());
+										params.getCharSet().get(), !params.isTest());
 			}
 		} catch (MissingArgumentException m) {
 			log.error(m.getMessage());

@@ -82,12 +82,12 @@ public class ParametersTest {
 	public void givenCharSet_shouldReturnArgsOrDefault() throws Exception {
 		final String charset = "big5";
 		Parameters params = Parameters.parse(new String[] {"-hc", charset});
-		assertEquals(charset, params.getCharSet());
+		assertEquals(charset, params.getCharSet().get());
 		
 		params = Parameters.parse(new String[] {"--charset", charset, "source", "target"});
-		assertEquals(charset, params.getCharSet());
+		assertEquals(charset, params.getCharSet().get());
 		
 		params = Parameters.parse(new String[] {"-h"});
-		assertEquals("BIG5", params.getCharSet());
+		assertEquals(Optional.empty(), params.getCharSet());
 	}
 }
