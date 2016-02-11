@@ -17,11 +17,15 @@ Some of the media players, for example iTunes, support character set UTF-8 only.
 ## Usage
 **For Windows:**
 
-  Execute ```bin\id-charset-converter.bat [-c <CHARSET>] [-h] [-t] source [target]```
+  Execute 
+  
+  ```bin\id-charset-converter.bat [-c <CHARSET>] [-h] [-t] source [target]```
 
 **For Mac / Unix-like / Linux-Like:**
 
-  Execute ```id3-charset-converter [-c <CHARSET>] [-h] [-t] source [target]```
+  Execute 
+  
+  ```bin/id3-charset-converter [-c <CHARSET>] [-h] [-t] source [target]```
 
   - __source (required):__ path of source file or folder
   - __target (optional):__ path of output file or folder
@@ -33,10 +37,10 @@ Some of the media players, for example iTunes, support character set UTF-8 only.
 ###### Convert single file from ISO-8859-1 to UTF-8 and save to new mp3 ######
 ```id3-charset-converter -c ISO-8859-1 ~/Downloads/input.mp3 /tmp/output.mp3```
 
-###### Convert all files under folder music and save converted file under the same folder  ######
-```id3-charset-converter music```
+###### Convert all files under folder music in BIG5 and save converted file under the same folder  ######
+```id3-charset-converter -c BIG5 music```
 
-###### Test converting of file (do not save to new file) ######
+###### Test converting of file by auto charset detection (do not save to new file) ######
 ```id3-charset-converter -t music/input.mp3```
 
 ## Note ##
