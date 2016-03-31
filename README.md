@@ -42,4 +42,4 @@ Some of the media players, for example iTunes, support character set UTF-8 only.
 ## Note ##
 This is a personal project by [Timmy Wong](https://github.com/thcathy). The project is adopted TDD with code coverage almost 100%.
 
-Feel free to contact me if you want any new feature or bug fixing.
+Feel free to contact thcathy@gmail.com if you want any new feature or bug fixing.
