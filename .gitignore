@@ -34,10 +34,12 @@ local.properties
  
 # TeXlipse plugin
 .texlipse
+
+# IntelliJ
+.idea
  
  
 ### Gradle ###
-.gradle
 build/
 
 **/.DS_Store
