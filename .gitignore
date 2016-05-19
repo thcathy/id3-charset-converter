@@ -43,3 +43,6 @@ local.properties
 build/
 
 .DS_Store
+
+### IntelliJ ###
+.idea
