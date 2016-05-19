@@ -18,17 +18,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.mpatric.mp3agic.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ibm.icu.text.CharsetDetector;
-import com.mpatric.mp3agic.EncodedText;
-import com.mpatric.mp3agic.ID3v2;
-import com.mpatric.mp3agic.ID3v2Frame;
-import com.mpatric.mp3agic.ID3v2FrameSet;
-import com.mpatric.mp3agic.Mp3File;
 
 public class ConvertService {
 	private static Logger log = LoggerFactory.getLogger(ConvertService.class);
@@ -46,14 +42,14 @@ public class ConvertService {
 		tgtPathFactory.createFolder();
 
 		files.stream()
-				.flatMap(f -> filterInValidMp3(f))
+				.flatMap(f -> openMp3File(f))				
 				.map(mp3 -> convertTagsData(mp3, inputCharset))
 				.filter(x -> isSave)
 				.forEach(convertedMp3 -> save(convertedMp3, tgtPathFactory.makeFilePath(convertedMp3.getFilename())));
 	}
 
 	private Collection<File> collectFiles(String source) {
-		try {
+		try {			
 			return FileUtils.listFiles(new File(source), new String[] { "mp3" }, true);
 		} catch (Exception e) {
 			return Arrays.asList(new File(source));
@@ -79,11 +75,20 @@ public class ConvertService {
 		}
 		return mp3;
 	}
-
+	
 	private Mp3File convertTagsData(Mp3File mp3, Optional<String> inputCharset) {
+		if (mp3.hasId3v2Tag())
+			return convertV2TagsData(mp3, inputCharset);
+		else if (mp3.hasId3v1Tag())
+			return convertV1TagsData(mp3, inputCharset);
+		
+		throw new UnsupportedOperationException("Cannot process mp3 without Id3 tag");
+	}
+
+	private Mp3File convertV2TagsData(Mp3File mp3, Optional<String> inputCharset) {
 		try {			
 			final ID3v2 id3v2Tag = mp3.getId3v2Tag();
-			String charset = inputCharset.orElseGet(() -> detectCharsetByTitle(id3v2Tag));
+			String charset = inputCharset.orElseGet(() -> detectCharsetByV2Title(id3v2Tag));
 			tagsToConvert.forEach(tag -> decodeText(id3v2Tag, tag, charset));
 			logTag(id3v2Tag);
 
@@ -94,15 +99,34 @@ public class ConvertService {
 		}
 	}
 
-	private Stream<Mp3File> filterInValidMp3(File f) {
+	public Mp3File convertV1TagsData(Mp3File mp3, Optional<String> inputCharset) {
+		try {
+			final ID3v1 v1Tag = mp3.getId3v1Tag();
+			String charset = inputCharset.orElse("ISO-8859-1");
+			
+			final ID3v2 v2Tag = new ID3v24Tag();
+			v2Tag.setTitle(convertEncoding(v1Tag.getTitle(), charset));
+			v2Tag.setAlbum(convertEncoding(v1Tag.getAlbum(), charset));
+			v2Tag.setArtist(convertEncoding(v1Tag.getArtist(), charset));
+
+			logTag(v2Tag);
+			mp3.removeId3v1Tag();
+			mp3.setId3v2Tag(v2Tag);
+			return mp3;
+		} catch (Exception e) {
+			log.warn("Cannot process mp3: " + mp3.getFilename(), e);
+			return null;
+		}
+	}
+	
+	private String convertEncoding(String input, String inputCharset) throws UnsupportedEncodingException {
+		return new String(new String(input.getBytes("ISO8859_9"),inputCharset).getBytes(), TO_CHARSET);
+	}
+
+	private Stream<Mp3File> openMp3File(File f) {
 		log.info("convert file: {}", f.getAbsoluteFile());
 		try {
 			Mp3File mp3 = new Mp3File(f);
-			if (!mp3.hasId3v2Tag()) {
-				log.warn("Without ID3 version 2 tag, skip processing :" + f.getAbsolutePath());
-				return Stream.empty();
-			}			
-				
 			return Stream.of(mp3);			
 		} catch (Exception e) {
 			log.warn("Cannot process mp3: " + f.getAbsolutePath(), e);
@@ -110,10 +134,14 @@ public class ConvertService {
 		}		
 	}
 
-	private String detectCharsetByTitle(ID3v2 id3v2Tag) {
+	private String detectCharsetByV2Title(ID3v2 id3v2Tag) {
+		return detectCharset(ArrayUtils.remove(id3v2Tag.getFrameSets().get(ID_TITLE).getFrames().get(0).getData(), 0));
+	}
+	
+	private String detectCharset(byte[] input) {
 		String charset =  new CharsetDetector()
-							.setText(ArrayUtils.remove(id3v2Tag.getFrameSets().get(ID_TITLE).getFrames().get(0).getData(), 0))
-							.detect().getName();
+								.setText(input)
+								.detect().getName();
 		log.info("Auto Detected Charset: {}", charset);
 		return charset;
 	}
