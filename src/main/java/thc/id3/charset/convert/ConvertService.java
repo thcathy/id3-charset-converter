@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -44,7 +45,9 @@ public class ConvertService {
 		TargetPathFactory tgtPathFactory = TargetPathFactory.getFactory(source, target, TO_CHARSET);
 		tgtPathFactory.createFolder();
 
-		files.stream().map(f -> convertTagsData(f, inputCharset))
+		files.stream()
+				.flatMap(f -> filterInValidMp3(f))
+				.map(mp3 -> convertTagsData(mp3, inputCharset))
 				.filter(x -> isSave)
 				.forEach(convertedMp3 -> save(convertedMp3, tgtPathFactory.makeFilePath(convertedMp3.getFilename())));
 	}
@@ -77,11 +80,8 @@ public class ConvertService {
 		return mp3;
 	}
 
-	private Mp3File convertTagsData(File f, Optional<String> inputCharset) {
-		log.info("convert file: {}", f.getAbsoluteFile());
-
-		try {
-			Mp3File mp3 = new Mp3File(f);
+	private Mp3File convertTagsData(Mp3File mp3, Optional<String> inputCharset) {
+		try {			
 			final ID3v2 id3v2Tag = mp3.getId3v2Tag();
 			String charset = inputCharset.orElseGet(() -> detectCharsetByTitle(id3v2Tag));
 			tagsToConvert.forEach(tag -> decodeText(id3v2Tag, tag, charset));
@@ -89,9 +89,25 @@ public class ConvertService {
 
 			return mp3;
 		} catch (Exception e) {
-			log.warn("Cannot process mp3: " + f.getAbsolutePath(), e);
+			log.warn("Cannot process mp3: " + mp3.getFilename(), e);
 			return null;
 		}
+	}
+
+	private Stream<Mp3File> filterInValidMp3(File f) {
+		log.info("convert file: {}", f.getAbsoluteFile());
+		try {
+			Mp3File mp3 = new Mp3File(f);
+			if (!mp3.hasId3v2Tag()) {
+				log.warn("Without ID3 version 2 tag, skip processing :" + f.getAbsolutePath());
+				return Stream.empty();
+			}			
+				
+			return Stream.of(mp3);			
+		} catch (Exception e) {
+			log.warn("Cannot process mp3: " + f.getAbsolutePath(), e);
+			return Stream.empty();
+		}		
 	}
 
 	private String detectCharsetByTitle(ID3v2 id3v2Tag) {

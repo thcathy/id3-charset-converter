@@ -172,4 +172,14 @@ public class Id3CharSetConverterCommandTest {
 				
 		FileUtils.forceDelete(new File(targetFolder)); // clean up
 	}
+	
+	@Test
+	public void givenMp3WithoutID3TagV2_shouldNotConvert() throws Exception {
+		URL fileUri = this.getClass().getClassLoader().getResource("mp3/ID3Tagv1.mp3");
+		File f = new File(fileUri.getPath());
+		String outputFilePath = f.getParent() + "/converted.mp3";
+
+		new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {fileUri.getPath(), outputFilePath});
+		assertFalse(new File(outputFilePath).exists());
+	}
 }
