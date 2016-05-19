@@ -29,6 +29,7 @@ import com.ibm.icu.text.CharsetDetector;
 public class ConvertService {
 	private static Logger log = LoggerFactory.getLogger(ConvertService.class);
 	
+	public static final String DEFAULT_ID3V1_CHARSET = "ISO-8859-1";
 	public static String TO_CHARSET = "UTF-8";
 
 	private static List<String> tagsToConvert = Arrays.asList(ID_ARTIST, ID_TITLE, ID_ALBUM, ID_COMPOSER, ID_PUBLISHER,
@@ -102,7 +103,7 @@ public class ConvertService {
 	public Mp3File convertV1TagsData(Mp3File mp3, Optional<String> inputCharset) {
 		try {
 			final ID3v1 v1Tag = mp3.getId3v1Tag();
-			String charset = inputCharset.orElse("ISO-8859-1");
+			String charset = inputCharset.orElse(DEFAULT_ID3V1_CHARSET);
 			
 			final ID3v2 v2Tag = new ID3v24Tag();
 			v2Tag.setTitle(convertEncoding(v1Tag.getTitle(), charset));
@@ -120,7 +121,7 @@ public class ConvertService {
 	}
 	
 	private String convertEncoding(String input, String inputCharset) throws UnsupportedEncodingException {
-		return new String(new String(input.getBytes("ISO8859_9"),inputCharset).getBytes(), TO_CHARSET);
+		return new String(new String(input.getBytes(DEFAULT_ID3V1_CHARSET),inputCharset).getBytes(), TO_CHARSET);
 	}
 
 	private Stream<Mp3File> openMp3File(File f) {
