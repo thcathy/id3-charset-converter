@@ -1,3 +1,3 @@
 test:
   post:
-    - ./gradlew test
+    - ./gradlew assemble
