@@ -1,6 +1,7 @@
 general:
   artifacts:
     - "build/distributions"    
+    - "build/reports/tests"
 
 test:
   post:
