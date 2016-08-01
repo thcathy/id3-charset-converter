@@ -2,8 +2,12 @@ general:
   artifacts:
     - "build/distributions"    
 
+machine:
+  environment:
+    CIRCLE_TEST_REPORTS: build/reports/tests
+
 test:
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
-    - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+    - find . -type f -regex "./build/reports/tests" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
     - ./gradlew assemble
