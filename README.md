@@ -1,4 +1,4 @@
-# id3-charset-converter
+# id3-charset-converter [![CircleCI](https://circleci.com/gh/thcathy/id3-charset-converter.svg?style=svg)](https://circleci.com/gh/thcathy/id3-charset-converter)
 A Java command line application to covert charset of id3 tags to UTF-8. Support auto charset detection and batch convertion.
 
 ## About
