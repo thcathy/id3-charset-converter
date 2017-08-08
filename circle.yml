@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/
+    working_directory: ~/id3-charset-converter
     docker:
         - image: circleci/openjdk:8-jdk
           environment:
