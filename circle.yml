@@ -32,4 +32,4 @@ jobs:
           name: Build Artifacts
           command: ./gradlew assemble
       - store_artifacts:
-          path: ./distributions
+          path: ./build/distributions
