@@ -7,7 +7,17 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: id3-charset-converter-{{ checksum "build.gradle" }}      
+          key: id3-charset-converter-{{ checksum "build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: id3-charset-converter-{{ checksum "build.gradle" }}
+      - run:
+          name: Run Tests
+          command: ./gradlew test
       - run:
           name: Save test results
           command: |
@@ -15,5 +25,8 @@ jobs:
             find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} ~/junit/ \;
       - store_test_results:
           path: ~/junit
+      - run:
+          name: Build Artifacts
+          command: ./gradlew assemble
       - store_artifacts:
-          path: ~/junit
+          path: ./distributions
