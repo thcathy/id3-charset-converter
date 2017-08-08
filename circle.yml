@@ -1,0 +1,35 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/
+    docker:
+        - image: circleci/openjdk:8-jdk
+          environment:
+            TERM: dumb
+    steps:
+      - checkout
+      - restore_cache:
+          key: id3-charset-converter-{{ checksum "build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew dependencies      
+      - run:
+          name: Run Tests
+          command: ./gradlew check
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: id3-charset-converter-{{ checksum "build.gradle" }}
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p ~/junit/
+            find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} ~/junit/ \;
+          when: always
+      - store_test_results:
+          path: ~/junit
+      - run:
+          name: Build Artifacts
+          command: ./gradlew assemble
+      - store_artifacts:
+          path: ./distributions
