@@ -1,18 +1,13 @@
 package thc.id3.charset.convert;
-import java.util.Optional;
+import org.apache.commons.cli.*;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.MissingArgumentException;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
+import java.util.Optional;
 
 public class Parameters {
 	final static String OPTION_HELP = "help";
 	final static String OPTION_TEST = "test";
 	final static String OPTION_CHARSET = "charset";
+	final static String OPTION_WITHINDAY = "withinDay";
 		
 	final static Options options = buildOptions();
 	
@@ -30,7 +25,13 @@ public class Parameters {
 							.desc("source CHARSET\n auto-detected by title if not specify\n ! Detection is not 100% correct, suggest test run before saving file")
 							.longOpt(OPTION_CHARSET)
 							.hasArg().argName("CHARSET")
-							.build());		
+							.build());
+		options.addOption(Option.builder("w")
+							.desc("last modified date within NUMBER of days")
+							.longOpt(OPTION_WITHINDAY)
+							.hasArg().argName("NUMBER")
+							.type(Number.class)
+							.build());
 		return options;
 	}
 
@@ -74,6 +75,10 @@ public class Parameters {
 	
 	public Optional<String> getCharSet() {
 		return Optional.ofNullable(commandLine.getOptionValue(OPTION_CHARSET));
+	}
+
+	public Optional<Long> getWithDays() throws ParseException {
+		return Optional.ofNullable((Long) commandLine.getParsedOptionValue(OPTION_WITHINDAY));
 	}
 		
 	public static void printHelp(HelpFormatter formatter) {

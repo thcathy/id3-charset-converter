@@ -1,12 +1,12 @@
 package thc.id3.charset.convert;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Optional;
-
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingArgumentException;
 import org.junit.Test;
+
+import java.util.Optional;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ParametersTest {
 	
@@ -89,5 +89,12 @@ public class ParametersTest {
 		
 		params = Parameters.parse(new String[] {"-h"});
 		assertEquals(Optional.empty(), params.getCharSet());
+	}
+
+	@Test
+	public void givenWithinDays_shouldReturnInputValue() throws Exception {
+		final String withinDays = "30";
+		Parameters params = Parameters.parse(new String[] {"-hw", withinDays});
+		assertEquals(30, params.getWithDays().get().longValue());
 	}
 }

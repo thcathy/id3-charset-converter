@@ -1,14 +1,11 @@
 package thc.id3.charset.convert;
 
-import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_ALBUM;
-import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_ALBUM_ARTIST;
-import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_ARTIST;
-import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_COMPOSER;
-import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_COPYRIGHT;
-import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_ENCODER;
-import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_ORIGINAL_ARTIST;
-import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_PUBLISHER;
-import static com.mpatric.mp3agic.AbstractID3v2Tag.ID_TITLE;
+import com.ibm.icu.text.CharsetDetector;
+import com.mpatric.mp3agic.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -18,13 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import com.mpatric.mp3agic.*;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.ibm.icu.text.CharsetDetector;
+import static com.mpatric.mp3agic.AbstractID3v2Tag.*;
 
 public class ConvertService {
 	private static Logger log = LoggerFactory.getLogger(ConvertService.class);
@@ -38,12 +29,12 @@ public class ConvertService {
 	public void convert(String source, String target, Optional<String> inputCharset, boolean isSave) throws Exception {
 		log.info("convert: path [{} > {}], encoding [{}]", source, target, inputCharset.orElse(""));
 
-		Collection<File> files = collectFiles(source);		
+		Collection<File> files = collectFiles(source);
 		TargetPathFactory tgtPathFactory = TargetPathFactory.getFactory(source, target, TO_CHARSET);
 		tgtPathFactory.createFolder();
 
 		files.stream()
-				.flatMap(f -> openMp3File(f))				
+				.flatMap(f -> openMp3File(f))
 				.map(mp3 -> convertTagsData(mp3, inputCharset))
 				.filter(x -> isSave)
 				.forEach(convertedMp3 -> save(convertedMp3, tgtPathFactory.makeFilePath(convertedMp3.getFilename())));
