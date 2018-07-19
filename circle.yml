@@ -33,3 +33,19 @@ jobs:
           command: ./gradlew assemble
       - store_artifacts:
           path: ./build/distributions
+          
+workflows:
+  version: 2
+  commit-workflow:
+    jobs:
+      - build 
+  scheduled-workflow:
+    triggers:
+      - schedule:
+          cron: "10 5 * * 5"
+          filters:
+            branches:
+              only: 
+                - master
+    jobs:
+      - build
