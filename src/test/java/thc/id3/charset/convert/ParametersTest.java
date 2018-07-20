@@ -94,7 +94,7 @@ public class ParametersTest {
 	@Test
 	public void givenWithinDays_shouldReturnInputValue() throws Exception {
 		final String withinDays = "30";
-		Parameters params = Parameters.parse(new String[] {"-hw", withinDays});
-		assertEquals(30, params.getWithDays().get().longValue());
+		Parameters params = Parameters.parse(new String[] {"-hd", withinDays});
+		assertEquals(30, params.getWithinDays().get().longValue());
 	}
 }

@@ -9,10 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static com.mpatric.mp3agic.AbstractID3v2Tag.*;
@@ -26,18 +23,26 @@ public class ConvertService {
 	private static List<String> tagsToConvert = Arrays.asList(ID_ARTIST, ID_TITLE, ID_ALBUM, ID_COMPOSER, ID_PUBLISHER,
 			ID_ORIGINAL_ARTIST, ID_ALBUM_ARTIST, ID_ENCODER, ID_COPYRIGHT);
 
-	public void convert(String source, String target, Optional<String> inputCharset, boolean isSave) throws Exception {
-		log.info("convert: path [{} > {}], encoding [{}]", source, target, inputCharset.orElse(""));
+	public void convert(String source, String target, Optional<String> inputCharset, boolean isSave, Optional<Long> withinDays) throws Exception {
+		log.info("convert: path [{} > {}], encoding [{}], within {} days", source, target, inputCharset.orElse(""), withinDays);
 
 		Collection<File> files = collectFiles(source);
 		TargetPathFactory tgtPathFactory = TargetPathFactory.getFactory(source, target, TO_CHARSET);
 		tgtPathFactory.createFolder();
+		long lastModifiedTime = calculateLastModifiedTime(withinDays);
+		log.info("lastModifiedTime {}", lastModifiedTime);
 
 		files.stream()
+				.filter(f -> f.lastModified() >= lastModifiedTime)
 				.flatMap(f -> openMp3File(f))
 				.map(mp3 -> convertTagsData(mp3, inputCharset))
 				.filter(x -> isSave)
 				.forEach(convertedMp3 -> save(convertedMp3, tgtPathFactory.makeFilePath(convertedMp3.getFilename())));
+	}
+
+	private long calculateLastModifiedTime(Optional<Long> withinDays) {
+		long days = withinDays.orElse(1000l);
+		return new Date().getTime() - days * 86400000;
 	}
 
 	private Collection<File> collectFiles(String source) {

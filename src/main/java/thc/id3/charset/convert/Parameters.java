@@ -26,7 +26,7 @@ public class Parameters {
 							.longOpt(OPTION_CHARSET)
 							.hasArg().argName("CHARSET")
 							.build());
-		options.addOption(Option.builder("w")
+		options.addOption(Option.builder("d")
 							.desc("last modified date within NUMBER of days")
 							.longOpt(OPTION_WITHINDAY)
 							.hasArg().argName("NUMBER")
@@ -77,12 +77,12 @@ public class Parameters {
 		return Optional.ofNullable(commandLine.getOptionValue(OPTION_CHARSET));
 	}
 
-	public Optional<Long> getWithDays() throws ParseException {
+	public Optional<Long> getWithinDays() throws ParseException {
 		return Optional.ofNullable((Long) commandLine.getParsedOptionValue(OPTION_WITHINDAY));
 	}
 		
 	public static void printHelp(HelpFormatter formatter) {
-		formatter.printHelp("id3-charset-converter [-c <CHARSET>] [-h] [-t] source [target]", "Convert the ID3 tags of all mp3 under source to UTF-8 and save to target", options, "");
+		formatter.printHelp("id3-charset-converter [-c <CHARSET>] [-d <withinDays>] [-h] [-t] source [target]", "Convert the ID3 tags of all mp3 under source to UTF-8 and save to target", options, "");
 	}
 	
 	public static void main(String... args) {

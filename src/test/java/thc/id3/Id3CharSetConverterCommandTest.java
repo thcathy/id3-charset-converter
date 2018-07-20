@@ -16,6 +16,7 @@ import thc.id3.charset.convert.ConvertService;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -184,6 +185,24 @@ public class Id3CharSetConverterCommandTest {
 			checkGB18030Mp3Tag(outputFilePath);
 		} finally {
 			FileUtils.forceDelete(new File(outputFilePath)); // clean up
+		}
+	}
+
+	@Test
+	public void givenWithinDays_shouldConvertFileLastModifiedWithinInputDay() throws Exception {
+		URL newFileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
+		URL oldFileUri = this.getClass().getClassLoader().getResource("mp3/big5_b.mp3");
+		new File(newFileUri.toURI()).setLastModified(new Date().getTime() - 10000); // 10s before
+		new File(oldFileUri.toURI()).setLastModified(new Date().getTime() - 259200000); // 3 days before
+		String sourceFolder = new File(newFileUri.getPath()).getParent();
+		String targetFolder = "tmp";
+
+		try {
+			new Id3CharSetConverterCommand(formatter, convertService).run(new String[] {"-c", "big5", "-d", "2", sourceFolder, targetFolder});
+			checkBig5Mp3Tag(targetFolder + "/big5_UTF-8.mp3");
+			assertFalse(new File(targetFolder + "/big5_b_UTF-8.mp3").exists());
+		} finally {
+			FileUtils.forceDelete(new File(targetFolder)); // cleanup
 		}
 	}
 	
