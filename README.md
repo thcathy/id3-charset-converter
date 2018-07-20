@@ -39,7 +39,7 @@ Some of the media players, for example iTunes, support character set UTF-8 only.
 ```id3-charset-converter -c ISO-8859-1 ~/Downloads/input.mp3 /tmp/output.mp3```
 
 ###### Convert all files under folder music in BIG5 modified within last 10 days and save converted file under the same folder  ######
-```id3-charset-converter -c BIG5 music```
+```id3-charset-converter -d 10 -c BIG5 music```
 
 ###### Test converting of file by auto charset detection (do not save to new file) ######
 ```id3-charset-converter -t music/input.mp3```
