@@ -96,5 +96,8 @@ public class ParametersTest {
 		final String withinDays = "30";
 		Parameters params = Parameters.parse(new String[] {"-hd", withinDays});
 		assertEquals(30, params.getWithinDays().get().longValue());
+
+		params = Parameters.parse(new String[] {"--within-days", withinDays, "source", "target"});
+		assertEquals(30, params.getWithinDays().get().longValue());
 	}
 }

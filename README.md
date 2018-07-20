@@ -30,6 +30,7 @@ Some of the media players, for example iTunes, support character set UTF-8 only.
   - __source (required):__ path of source file or folder
   - __target (optional):__ path of output file or folder
   - __-c or --charset:__ source CHARSET, auto-detected by title if not specify (! Detection is not 100% correct, suggest run __--test__ before saving file)
+  - __-d or --within-days:__ convert file's last modified within INPUT days
   - __-t or --test:__ test run without saving file(s)
   - __-h or --help:__ print help message
   
@@ -37,7 +38,7 @@ Some of the media players, for example iTunes, support character set UTF-8 only.
 ###### Convert single file from ISO-8859-1 to UTF-8 and save to new mp3 ######
 ```id3-charset-converter -c ISO-8859-1 ~/Downloads/input.mp3 /tmp/output.mp3```
 
-###### Convert all files under folder music in BIG5 and save converted file under the same folder  ######
+###### Convert all files under folder music in BIG5 modified within last 10 days and save converted file under the same folder  ######
 ```id3-charset-converter -c BIG5 music```
 
 ###### Test converting of file by auto charset detection (do not save to new file) ######

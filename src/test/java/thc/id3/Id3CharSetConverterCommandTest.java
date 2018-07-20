@@ -189,7 +189,7 @@ public class Id3CharSetConverterCommandTest {
 	}
 
 	@Test
-	public void givenWithinDays_shouldConvertFileLastModifiedWithinInputDay() throws Exception {
+	public void givenParameter_d_shouldConvertFileLastModifiedWithinInputDay() throws Exception {
 		URL newFileUri = this.getClass().getClassLoader().getResource("mp3/big5.mp3");
 		URL oldFileUri = this.getClass().getClassLoader().getResource("mp3/big5_b.mp3");
 		new File(newFileUri.toURI()).setLastModified(new Date().getTime() - 10000); // 10s before

@@ -7,7 +7,7 @@ public class Parameters {
 	final static String OPTION_HELP = "help";
 	final static String OPTION_TEST = "test";
 	final static String OPTION_CHARSET = "charset";
-	final static String OPTION_WITHINDAY = "withinDay";
+	final static String OPTION_WITHINDAY = "within-days";
 		
 	final static Options options = buildOptions();
 	
